@@ -42,8 +42,8 @@ const HomeCourseList = (props: Props) => {
         <div
           onClick={() => onCoursePressed(i)}
           key={i}
-          className="flex cursor-pointer flex-col space-y-2 rounded-xl bg-white p-4 shadow-md
-          transition duration-200 ease-in-out hover:shadow-lg
+          className="flex cursor-pointer flex-col space-y-2 overflow-hidden rounded-xl bg-white p-4
+          shadow-md transition duration-200 ease-in-out hover:shadow-lg
           "
         >
           <span className="text-lg font-bold">{course.title}</span>
