@@ -40,7 +40,6 @@ const HomePage: NextPage = () => {
   );
 
   useEffect(() => {
-    console.log("I am here", query);
     setSearchTerm(query ?? "");
   }, [query, setSearchTerm]);
 
