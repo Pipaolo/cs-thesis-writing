@@ -18,7 +18,7 @@ datasource db {
 
 model Course {
     id          Int    @id @default(autoincrement())
-    name        String
+    name        String @unique
     description String
     url         String
 
@@ -31,11 +31,13 @@ model Course {
 // This will be used by our recommendations engine to store the interactions between users and courses
 model CourseInteraction {
     id       Int    @id @default(autoincrement())
-    course   Course @relation(fields: [courseId], references: [id])
+    course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
     courseId Int
     userId   String
 
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
     deletedAt DateTime? @db.DateTime
+
+    @@index([courseId])
 }

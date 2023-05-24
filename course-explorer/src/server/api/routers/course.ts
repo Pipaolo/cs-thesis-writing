@@ -28,16 +28,18 @@ export const courseRouter = createTRPCRouter({
           code: "FORBIDDEN",
         });
       }
+
+      // Convert the courses to the correct format
+      const parsedCourses = input.courses.map((course) => ({
+        description: course.description,
+        url: course.url,
+        name: course.title,
+      }));
+
       // Add all courses to the database
       const courses = await ctx.prisma.course.createMany({
-        data: input.courses.map(
-          (course) =>
-            ({
-              description: course.description,
-              url: course.url,
-              name: course.title,
-            } as Course)
-        ),
+        data: parsedCourses,
+        skipDuplicates: true,
       });
 
       // Find the interacted course
