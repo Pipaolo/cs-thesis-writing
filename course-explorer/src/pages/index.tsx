@@ -9,24 +9,48 @@ import {
   HomeHeader,
   HomeRecommendationList,
 } from "../features/home/components";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { type SearchResult } from "../server/api/routers/course";
-import { atom, useAtomValue } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { useDebounce } from "use-debounce";
+import { useRouter } from "next/router";
 
 export const homeSearchTermAtom = atom("");
 
 const HomePage: NextPage = () => {
-  const searchTerm = useAtomValue(homeSearchTermAtom);
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 1000);
+  const router = useRouter();
+  const { q } = router.query;
+  const query = useMemo(() => {
+    if (typeof q === "string") {
+      return q;
+    }
+
+    return "";
+  }, [q]);
+  const { push } = router;
+  const [searchTerm, setSearchTerm] = useAtom(homeSearchTermAtom);
+
   const searchCourses = api.course.searchCourses.useQuery(
     {
-      query: debouncedSearchTerm,
+      query,
     },
     {
       refetchOnWindowFocus: false,
     }
   );
+
+  useEffect(() => {
+    console.log("I am here", query);
+    setSearchTerm(query ?? "");
+  }, [query, setSearchTerm]);
+
+  useEffect(() => {
+    if (searchTerm) {
+      void push(`/?q=${searchTerm}`, undefined, {
+        shallow: true,
+      });
+    }
+  }, [searchTerm, push]);
 
   const courses = useMemo<SearchResult[]>(() => {
     return searchCourses.data || [];
@@ -41,9 +65,9 @@ const HomePage: NextPage = () => {
       </Head>
       <main className="flex min-h-screen flex-col items-center  bg-gradient-to-b from-[#03045E] to-[#023E8A] p-4">
         <div className="w-full max-w-lg space-y-4 rounded-md bg-white p-4">
-          <HomeHeader />
+          <HomeHeader isLoading={searchCourses.isLoading} />
           <HomeRecommendationList data={null} />
-          <HomeCourseList data={courses} />
+          <HomeCourseList isLoading={searchCourses.isLoading} data={courses} />
         </div>
       </main>
     </>
