@@ -25,6 +25,8 @@
     "@trpc/server": "^10.18.0",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
+    "googlethis": "^1.7.1",
+    "jotai": "^2.1.0",
     "lucide-react": "^0.221.0",
     "next": "^13.4.1",
     "next-auth": "^4.21.0",
@@ -35,9 +37,11 @@
     "superjson": "1.12.2",
     "tailwind-merge": "^1.12.0",
     "tailwindcss-animate": "^1.0.5",
+    "use-debounce": "^9.0.4",
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@swc-jotai/react-refresh": "^0.0.8",
     "@types/eslint": "^8.21.3",
     "@types/node": "^18.15.5",
     "@types/prettier": "^2.7.2",

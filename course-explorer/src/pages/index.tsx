@@ -4,10 +4,34 @@ import Head from "next/head";
 import Link from "next/link";
 
 import { api } from "~/utils/api";
-import { Input } from "@/components/ui/input";
-import { HomeHeader } from "../features/home/components";
+import {
+  HomeCourseList,
+  HomeHeader,
+  HomeRecommendationList,
+} from "../features/home/components";
+import { useMemo } from "react";
+import { type SearchResult } from "../server/api/routers/course";
+import { atom, useAtomValue } from "jotai";
+import { useDebounce } from "use-debounce";
+
+export const homeSearchTermAtom = atom("");
 
 const HomePage: NextPage = () => {
+  const searchTerm = useAtomValue(homeSearchTermAtom);
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 1000);
+  const searchCourses = api.course.searchCourses.useQuery(
+    {
+      query: debouncedSearchTerm,
+    },
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  const courses = useMemo<SearchResult[]>(() => {
+    return searchCourses.data || [];
+  }, [searchCourses.data]);
+
   return (
     <>
       <Head>
@@ -18,9 +42,8 @@ const HomePage: NextPage = () => {
       <main className="flex min-h-screen flex-col items-center  bg-gradient-to-b from-[#03045E] to-[#023E8A] p-4">
         <div className="w-full max-w-lg space-y-4 rounded-md bg-white p-4">
           <HomeHeader />
-          <Input placeholder="Search any course you like..." type="text" />
-
-          <h4>Courses you might like:</h4>
+          <HomeRecommendationList data={null} />
+          <HomeCourseList data={courses} />
         </div>
       </main>
     </>
