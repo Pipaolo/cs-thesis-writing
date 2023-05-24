@@ -2,7 +2,7 @@ import { z } from "zod";
 import { protectedProcedure } from "../trpc";
 import { createTRPCRouter } from "../trpc";
 import googlethis from "googlethis";
-import { CourseSchema } from "@/src/features/course/types";
+import { CourseCSVSchema, CourseSchema } from "@/src/features/course/types";
 import { TRPCError } from "@trpc/server";
 import { clerkClient } from "@clerk/nextjs";
 import { type Course } from "@prisma/client";
@@ -12,6 +12,20 @@ export type SearchResult = Awaited<
 >["results"][0];
 
 export const courseRouter = createTRPCRouter({
+  addMany: protectedProcedure
+    .input(z.array(CourseCSVSchema))
+    .mutation(async ({ ctx, input }) => {
+      const results = await ctx.prisma.course.createMany({
+        data: input.map((course) => ({
+          description: course.description,
+          url: course.url,
+          name: course.title,
+        })),
+        skipDuplicates: true,
+      });
+
+      return results;
+    }),
   addInteractedCourse: protectedProcedure
     .input(
       z.object({

@@ -14,4 +14,13 @@ export const CourseSchema = z.object({
   is_sponsored: z.boolean().default(false).optional(),
   favicons: CourseFavIconsSchema,
 });
+
 export type Course = z.infer<typeof CourseSchema>;
+
+export const CourseCSVSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  url: z.string(),
+});
+
+export type CourseCSV = z.infer<typeof CourseCSVSchema>;

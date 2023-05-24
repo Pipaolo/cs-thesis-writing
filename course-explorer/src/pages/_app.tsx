@@ -6,6 +6,8 @@ import { dark } from "@clerk/themes";
 import "~/styles/globals.css";
 
 import { ClerkProvider } from "@clerk/nextjs";
+import { ToastProvider } from "@/components/ui/toast";
+
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
@@ -17,6 +19,7 @@ const MyApp: AppType = ({ Component, pageProps: { ...pageProps } }) => {
       <ClerkProvider {...pageProps}>
         <main className={`${inter.variable} font-inter`}>
           <Component {...pageProps} />
+          <ToastProvider />
         </main>
       </ClerkProvider>
       <style jsx global>{`
