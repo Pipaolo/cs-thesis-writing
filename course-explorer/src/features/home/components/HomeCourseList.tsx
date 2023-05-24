@@ -1,4 +1,4 @@
-import { type RouterOutputs } from "@/src/utils/api";
+import { api, type RouterOutputs } from "@/src/utils/api";
 
 type Courses = RouterOutputs["course"]["searchCourses"];
 
@@ -23,11 +23,16 @@ const HomeCourseListLoader = () => {
 
 const HomeCourseList = (props: Props) => {
   const { data, isLoading = false } = props;
+  const interactedCourse = api.course.addInteractedCourse.useMutation();
 
-  const onCoursePressed = (index: number) => {
+  const onCoursePressed = async (index: number) => {
     const course = data[index];
     if (!course) return;
 
+    await interactedCourse.mutateAsync({
+      course: course,
+      courses: data,
+    });
     // Navigate to the link
     window.open(course.url, "_blank");
   };
@@ -40,7 +45,7 @@ const HomeCourseList = (props: Props) => {
     return data.map((course, i) => {
       return (
         <div
-          onClick={() => onCoursePressed(i)}
+          onClick={() => void onCoursePressed(i)}
           key={i}
           className="flex cursor-pointer flex-col space-y-2 overflow-hidden rounded-xl bg-white p-4
           shadow-md transition duration-200 ease-in-out hover:shadow-lg

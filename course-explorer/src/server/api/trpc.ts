@@ -18,7 +18,7 @@ import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import {
   type SignedOutAuthObject,
   type SignedInAuthObject,
-} from "@clerk/nextjs/dist/api";
+} from "@clerk/nextjs/api";
 import { getAuth } from "@clerk/nextjs/server";
 
 import { prisma } from "~/server/db";
@@ -52,8 +52,8 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  */
 export const createTRPCContext = (opts: CreateNextContextOptions) => {
   const { req } = opts;
-
-  return createInnerTRPCContext({ auth: getAuth(req) });
+  const auth = getAuth(req);
+  return createInnerTRPCContext({ auth });
 };
 
 /**
@@ -109,7 +109,6 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.auth.userId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
-
   return next({
     ctx: {
       // infers the `session` as non-nullable
