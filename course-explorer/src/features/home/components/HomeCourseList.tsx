@@ -25,11 +25,11 @@ const HomeCourseList = (props: Props) => {
   const { data, isLoading = false } = props;
   const interactedCourse = api.course.addInteractedCourse.useMutation();
 
-  const onCoursePressed = async (index: number) => {
+  const onCoursePressed = (index: number) => {
     const course = data[index];
     if (!course) return;
 
-    await interactedCourse.mutateAsync({
+    interactedCourse.mutate({
       course: course,
       courses: data,
     });
