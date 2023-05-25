@@ -25,6 +25,7 @@
     "@trpc/react-query": "^10.18.0",
     "@trpc/server": "^10.18.0",
     "@types/papaparse": "^5.3.7",
+    "axios": "^1.4.0",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
     "fzf": "^0.5.2",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@swc-jotai/react-refresh": "^0.0.8",
+    "@types/axios": "^0.14.0",
     "@types/eslint": "^8.21.3",
     "@types/node": "^18.15.5",
     "@types/prettier": "^2.7.2",

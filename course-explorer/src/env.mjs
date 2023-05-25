@@ -8,6 +8,7 @@ export const env = createEnv({
    */
   server: {
     DATABASE_URL: z.string().url(),
+    RECOMMENDATION_API_URL: z.string().url().min(1),
     NODE_ENV: z.enum(["development", "test", "production"]),
 
     // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
@@ -44,5 +45,6 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
     NEXT_PUBLIC_CLERK_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
     NEXT_PUBLIC_CLERK_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
+    RECOMMENDATION_API_URL: process.env.RECOMMENDATION_API_URL,
   },
 });

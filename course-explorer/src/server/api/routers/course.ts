@@ -7,6 +7,8 @@ import { TRPCError } from "@trpc/server";
 import { clerkClient } from "@clerk/nextjs";
 import { type Course } from "@prisma/client";
 import { Fzf } from "fzf";
+import axios from "axios";
+import { env } from "@/src/env.mjs";
 
 export type SearchResult = Awaited<
   ReturnType<typeof googlethis.search>
@@ -27,6 +29,7 @@ export const courseRouter = createTRPCRouter({
 
       return results;
     }),
+
   addInteractedCourse: protectedProcedure
     .input(
       z.object({
@@ -96,6 +99,47 @@ export const courseRouter = createTRPCRouter({
 
       return "Success";
     }),
+  getRecommendedCourses: protectedProcedure.query(async ({ ctx, input }) => {
+    const user = ctx.auth.user;
+    if (!user) {
+      return [];
+    }
+    const userDb = await ctx.prisma.user.findFirst({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    if (!userDb) {
+      return [];
+    }
+
+    const interactions = await ctx.prisma.courseInteraction.findMany({
+      where: {
+        user: {
+          userId: user.id,
+        },
+      },
+    });
+
+    if (interactions.length === 0) {
+      return [];
+    }
+
+    const response = await axios.get<string[]>(
+      `${env.RECOMMENDATION_API_URL}/courses/recommendations/${userDb.id}`
+    );
+
+    const courses = await ctx.prisma.course.findMany({
+      where: {
+        name: {
+          in: response.data,
+        },
+      },
+    });
+
+    return courses;
+  }),
   searchCourses: protectedProcedure
     .input(
       z.object({
