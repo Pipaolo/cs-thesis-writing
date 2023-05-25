@@ -1,4 +1,6 @@
+import { courseSearchAtom } from "@/src/pages";
 import { api, type RouterOutputs } from "@/src/utils/api";
+import { useAtomValue } from "jotai";
 
 type Courses = RouterOutputs["course"]["searchCourses"];
 
@@ -23,6 +25,7 @@ const HomeCourseListLoader = () => {
 
 const HomeCourseList = (props: Props) => {
   const { data, isLoading = false } = props;
+  const searchTerm = useAtomValue(courseSearchAtom);
   const interactedCourse = api.course.addInteractedCourse.useMutation();
 
   const onCoursePressed = (index: number) => {
@@ -40,6 +43,14 @@ const HomeCourseList = (props: Props) => {
   const renderItems = () => {
     if (isLoading) {
       return <HomeCourseListLoader />;
+    }
+
+    if (searchTerm === "") {
+      return (
+        <div className="rounded-xl bg-gradient-to-br from-blue-300 to-blue-800  p-4 text-center font-bold  shadow-md">
+          <h4 className="text-lg text-white">Search for a course</h4>
+        </div>
+      );
     }
 
     if (data.length === 0) {

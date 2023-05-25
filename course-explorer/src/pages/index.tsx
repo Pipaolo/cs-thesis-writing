@@ -15,7 +15,7 @@ import { atom, useAtom, useAtomValue } from "jotai";
 import { useDebounce } from "use-debounce";
 import { useRouter } from "next/router";
 
-export const homeSearchTermAtom = atom("");
+export const courseSearchAtom = atom("");
 
 const HomePage: NextPage = () => {
   const router = useRouter();
@@ -27,8 +27,7 @@ const HomePage: NextPage = () => {
 
     return "";
   }, [q]);
-  const { push } = router;
-  const [searchTerm, setSearchTerm] = useAtom(homeSearchTermAtom);
+  const [searchTerm, setSearchTerm] = useAtom(courseSearchAtom);
 
   const searchCourses = api.course.searchCourses.useQuery(
     {
@@ -42,14 +41,6 @@ const HomePage: NextPage = () => {
   useEffect(() => {
     setSearchTerm(query ?? "");
   }, [query, setSearchTerm]);
-
-  useEffect(() => {
-    if (searchTerm) {
-      void push(`/?q=${searchTerm}`, undefined, {
-        shallow: true,
-      });
-    }
-  }, [searchTerm, push]);
 
   const courses = useMemo<SearchResult[]>(() => {
     return searchCourses.data || [];

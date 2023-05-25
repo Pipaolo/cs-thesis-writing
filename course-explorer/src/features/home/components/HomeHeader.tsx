@@ -1,20 +1,23 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
-import { homeSearchTermAtom } from "@/src/pages";
+import { courseSearchAtom } from "@/src/pages";
 import { UserButton } from "@clerk/nextjs";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { SearchIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HomeSearchFormSchema } from "../types";
+import { useRouter } from "next/router";
 
 interface Props {
   isLoading: boolean | undefined;
 }
 const HomeHeader = (props: Props) => {
+  const router = useRouter();
+
   const { isLoading = false } = props;
-  const [searchTerm, setSearchTerm] = useAtom(homeSearchTermAtom);
+  const searchTerm = useAtomValue(courseSearchAtom);
   const { register, handleSubmit } = useForm<HomeSearchFormSchema>({
     resolver: zodResolver(HomeSearchFormSchema),
     values: {
@@ -23,7 +26,11 @@ const HomeHeader = (props: Props) => {
   });
 
   const onSubmit = (data: HomeSearchFormSchema) => {
-    setSearchTerm(data.query);
+    const { query } = data;
+    const path = query ? `/?q=${query}` : "/";
+    router.push(path, undefined, {
+      shallow: true,
+    });
   };
 
   return (
@@ -36,7 +43,10 @@ const HomeHeader = (props: Props) => {
           },
         }}
       />
-      <form onSubmit={handleSubmit(onSubmit)} className="flex w-full space-x-4">
+      <form
+        onSubmit={handleSubmit(onSubmit, console.error)}
+        className="flex w-full space-x-4"
+      >
         <Input
           {...register("query")}
           placeholder="Search any course you like..."
