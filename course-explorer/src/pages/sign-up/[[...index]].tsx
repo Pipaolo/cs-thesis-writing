@@ -1,3 +1,4 @@
+import { env } from "@/src/env.mjs";
 import { SignUp } from "@clerk/nextjs";
 
 export default function SignUpPage() {

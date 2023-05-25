@@ -18,6 +18,7 @@ import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import {
   type SignedOutAuthObject,
   type SignedInAuthObject,
+  clerkClient,
 } from "@clerk/nextjs/api";
 import { getAuth } from "@clerk/nextjs/server";
 
@@ -53,6 +54,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
 export const createTRPCContext = (opts: CreateNextContextOptions) => {
   const { req } = opts;
   const auth = getAuth(req);
+
   return createInnerTRPCContext({ auth });
 };
 
@@ -105,10 +107,14 @@ export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 
 /** Reusable middleware that enforces users are logged in before running the procedure. */
-const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
+const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
   if (!ctx.auth.userId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+
+  const user = await clerkClient.users.getUser(ctx.auth.userId);
+  ctx.auth.user = user;
+
   return next({
     ctx: {
       // infers the `session` as non-nullable

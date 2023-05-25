@@ -34,7 +34,7 @@ export const courseRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const user = await clerkClient.users.getUser(ctx.auth.userId);
+      const user = ctx.auth.user;
 
       if (!user) {
         throw new TRPCError({
@@ -74,14 +74,26 @@ export const courseRouter = createTRPCRouter({
 
       await ctx.prisma.courseInteraction.create({
         data: {
-          userId: user.id,
-          courseId: course.id,
+          course: {
+            connect: {
+              id: course.id,
+            },
+          },
+          user: {
+            connectOrCreate: {
+              where: {
+                userId: user.id,
+              },
+              create: {
+                userId: user.id,
+                username: user.username ?? "",
+              },
+            },
+          },
         },
       });
 
-      return {
-        courses,
-      };
+      return "Success";
     }),
   searchCourses: protectedProcedure
     .input(

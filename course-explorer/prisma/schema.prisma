@@ -16,6 +16,13 @@ datasource db {
     relationMode = "prisma"
 }
 
+model User {
+    id           Int                 @id @default(autoincrement())
+    userId       String              @unique
+    username     String              @unique
+    interactions CourseInteraction[]
+}
+
 model Course {
     id          Int    @id @default(autoincrement())
     name        String @unique
@@ -33,11 +40,14 @@ model CourseInteraction {
     id       Int    @id @default(autoincrement())
     course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
     courseId Int
-    userId   String
+
+    user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId Int
 
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
     deletedAt DateTime? @db.DateTime
 
     @@index([courseId])
+    @@index([userId])
 }
