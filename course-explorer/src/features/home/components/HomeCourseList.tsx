@@ -42,6 +42,14 @@ const HomeCourseList = (props: Props) => {
       return <HomeCourseListLoader />;
     }
 
+    if (data.length === 0) {
+      return (
+        <div className="rounded-xl bg-gradient-to-br from-blue-300 to-blue-800  p-4 text-center font-bold  shadow-md">
+          <h4 className="text-lg text-white">No Courses Found</h4>
+        </div>
+      );
+    }
+
     return data.map((course, i) => {
       return (
         <div

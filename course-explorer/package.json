@@ -27,6 +27,7 @@
     "@types/papaparse": "^5.3.7",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
+    "fzf": "^0.5.2",
     "googlethis": "^1.7.1",
     "jotai": "^2.1.0",
     "lucide-react": "^0.221.0",

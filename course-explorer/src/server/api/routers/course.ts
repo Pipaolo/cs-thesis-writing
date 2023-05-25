@@ -6,6 +6,7 @@ import { CourseCSVSchema, CourseSchema } from "@/src/features/course/types";
 import { TRPCError } from "@trpc/server";
 import { clerkClient } from "@clerk/nextjs";
 import { type Course } from "@prisma/client";
+import { Fzf } from "fzf";
 
 export type SearchResult = Awaited<
   ReturnType<typeof googlethis.search>
@@ -110,10 +111,18 @@ export const courseRouter = createTRPCRouter({
         safe: true,
         additional_params: {
           hl: "en",
-          num: 10,
+          num: 20,
         },
       });
+      const results = response.results;
+      const fzf = new Fzf(results, {
+        selector: (result) => result.title,
+      });
 
-      return response.results;
+      // Make sure that the results that are being returned are for courses
+      const entries = fzf.find("course");
+      const filteredResults = entries.map((entry) => entry.item);
+
+      return filteredResults;
     }),
 });
