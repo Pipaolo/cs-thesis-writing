@@ -28,7 +28,7 @@ const HomeHeader = (props: Props) => {
   const onSubmit = (data: HomeSearchFormSchema) => {
     const { query } = data;
     const path = query ? `/?q=${query}` : "/";
-    router.push(path, undefined, {
+    void router.push(path, undefined, {
       shallow: true,
     });
   };
