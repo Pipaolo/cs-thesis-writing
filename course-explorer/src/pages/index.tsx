@@ -56,7 +56,7 @@ const HomePage: NextPage = () => {
       <main className="flex min-h-screen flex-col items-center  bg-gradient-to-b from-[#03045E] to-[#023E8A] p-4">
         <div className="w-full max-w-lg space-y-4 rounded-md bg-white p-4">
           <HomeHeader isLoading={searchCourses.isLoading} />
-          <HomeRecommendationList data={null} />
+          <HomeRecommendationList />
           <HomeCourseList isLoading={searchCourses.isLoading} data={courses} />
         </div>
       </main>
