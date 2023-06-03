@@ -194,6 +194,7 @@
 /course-platform/.env
 /course-platform/.venv
 /course-platform/env/
+/course-platform/study-env/
 /course-platform/venv/
 /course-platform/ENV/
 /course-platform/env.bak/
