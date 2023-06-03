@@ -2,7 +2,11 @@ import { z } from "zod";
 import { protectedProcedure } from "../trpc";
 import { createTRPCRouter } from "../trpc";
 import googlethis from "googlethis";
-import { CourseCSVSchema, CourseSchema } from "@/src/features/course/types";
+import {
+  CourseCSVSchema,
+  type CourseRecommendation,
+  CourseSchema,
+} from "@/src/features/course/types";
 import { TRPCError } from "@trpc/server";
 import { clerkClient } from "@clerk/nextjs";
 import { type Course } from "@prisma/client";
@@ -114,26 +118,14 @@ export const courseRouter = createTRPCRouter({
       return [];
     }
 
-    const interactions = await ctx.prisma.courseInteraction.findMany({
-      where: {
-        user: {
-          userId: user.id,
-        },
-      },
-    });
-
-    if (interactions.length === 0) {
-      return [];
-    }
-
-    const response = await axios.get<string[]>(
+    const response = await axios.get<CourseRecommendation[]>(
       `${env.RECOMMENDATION_API_URL}/courses/recommendations/${userDb.id}`
     );
 
     const courses = await ctx.prisma.course.findMany({
       where: {
-        name: {
-          in: response.data,
+        id: {
+          in: response.data.map((course) => course.id),
         },
       },
     });

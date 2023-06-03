@@ -24,3 +24,10 @@ export const CourseCSVSchema = z.object({
 });
 
 export type CourseCSV = z.infer<typeof CourseCSVSchema>;
+
+export const CourseRecommedationSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+
+export type CourseRecommendation = z.infer<typeof CourseRecommedationSchema>;
