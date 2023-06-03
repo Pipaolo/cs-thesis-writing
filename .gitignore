@@ -191,6 +191,10 @@
 /course-platform/*.sage.py
 
 # Environments
+/course-platform/api/.env
+
+/course-platform/.conda
+/course-platform/.conda/
 /course-platform/.env
 /course-platform/.venv
 /course-platform/env/
@@ -231,3 +235,5 @@
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 # END OF PYTHON THINGS
+.conda
+.conda/

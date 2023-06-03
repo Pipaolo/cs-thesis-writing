@@ -1,6 +1,5 @@
 from flask import Flask, Response
-import tensorflow as tf
-import tensorflow_datasets as tfds
+
 import numpy as np
 import pandas as pd
 from database import db_session, engine
@@ -31,7 +30,7 @@ def update_model():
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(update_model, "interval", minutes=2)
+scheduler.add_job(update_model, "interval", minutes=10)
 scheduler.start()
 
 app = Flask(__name__)
@@ -39,11 +38,26 @@ app = Flask(__name__)
 
 @app.route("/courses/recommendations/<int:user_id>")
 def get_recommended_course(user_id: int):
-    results = recommendations_engine.predict(str(user_id))
-    # Convert the ndarray to a list
-    courses = pd.Series(results).to_json(orient="values")
 
-    return Response(courses, mimetype="application/json")
+    courses = pd.read_sql("select * from Course", engine, columns=["id", "name"])
+
+    results = recommendations_engine.predict(user_id)
+    if(results is None):
+        data = pd.DataFrame(results)
+        data = data.to_json(orient="records")
+        return Response(data, mimetype="application/json")
+
+    # Get the top 10 results with id and name
+    top_items_name = courses['name'][np.argsort(results)]
+    top_items_id = courses['id'][np.argsort(results)]
+    top_items= pd.merge(top_items_id, top_items_name, left_index=True, right_index=True)
+   
+    # Convert to json
+    data = pd.DataFrame(top_items[:10])
+    data = data.to_json(orient="records")
+
+    # Convert the ndarray to a list
+    return Response(data, mimetype="application/json")
 
 
 @app.route("/")
