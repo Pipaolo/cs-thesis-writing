@@ -53,8 +53,8 @@ class RecommendationsEngine:
         file_model = open(f'{models_directory}/recommendations-model.pickle', 'wb')
         file_dataset = open(f'{models_directory}/dataset.pickle', 'wb')
 
-        pickle.dump(model, file_model)
-        pickle.dump(dataset, file_dataset)
+        pickle.dump(model, file_model, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(dataset, file_dataset, protocol=pickle.HIGHEST_PROTOCOL)
 
         file_model.close()
         file_dataset.close()
