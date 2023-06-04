@@ -50,16 +50,10 @@ class RecommendationsEngine:
           ,epochs=30
           )
         # Save the model
-        file_model = open(f'{models_directory}/recommendations-model.pickle', 'wb')
-        file_dataset = open(f'{models_directory}/dataset.pickle', 'wb')
-
-        pickle.dump(model, file_model, protocol=pickle.HIGHEST_PROTOCOL)
-        pickle.dump(dataset, file_dataset, protocol=pickle.HIGHEST_PROTOCOL)
-
-        file_model.close()
-        file_dataset.close()
-
-
+        with open(f'{models_directory}/recommendations-model.pickle', 'wb') as file_model:
+            pickle.dump(model, file_model, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f'{models_directory}/dataset.pickle', 'wb') as file_dataset:
+            pickle.dump(dataset, file_dataset, protocol=pickle.HIGHEST_PROTOCOL)
 # Deprecated
 # CourseModel
 # class CourseModel(tfrs.Model):
