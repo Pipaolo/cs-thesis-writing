@@ -13,11 +13,12 @@ class RecommendationsEngine:
         pass
 
     def _load(self) -> Tuple[Dataset, LightFM]:
-        file_model = open(f'{models_directory}/recommendations-model.pickle', 'rb', protocol=pickle.HIGHEST_PROTOCOL)
-        file_dataset = open(f'{models_directory}/dataset.pickle', 'rb', protocol=pickle.HIGHEST_PROTOCOL)
+        file_model = open(f'{models_directory}/recommendations-model.pickle', 'rb')
+        file_dataset = open(f'{models_directory}/dataset.pickle', 'rb')
         
         dataset = cast(Dataset, pickle.load(file_dataset))
         model = cast(LightFM, pickle.load(file_model)) 
+        
         file_model.close()
         file_dataset.close()
 
