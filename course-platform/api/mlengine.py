@@ -34,7 +34,7 @@ class RecommendationsEngine:
             return None
         
     def train(self, courses: pd.DataFrame, course_interactions: pd.DataFrame):
-        dataset, model = self._load()
+        dataset = Dataset()        
         dataset.fit_partial(
             users=course_interactions['userId']
             ,items=courses['id']
@@ -44,7 +44,8 @@ class RecommendationsEngine:
         item_features = dataset.build_item_features(((x['id'],[x['name']]) for _, x in courses.iterrows()))
         (interactions, _) = dataset.build_interactions((
             (x['userId'], x['courseId']) for _, x in course_interactions.iterrows()))
-       
+        
+        model = LightFM(loss="warp", learning_rate=0.05)
         model.fit(interactions
           ,item_features=item_features
           ,epochs=30
