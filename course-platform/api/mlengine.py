@@ -34,6 +34,9 @@ class RecommendationsEngine:
             return None
         
     def train(self, courses: pd.DataFrame, course_interactions: pd.DataFrame):
+        print("Start training process...")
+        # Load the data
+        print("Preparing dataset...")
         dataset = Dataset()        
         dataset.fit_partial(
             users=course_interactions['userId']
@@ -44,17 +47,26 @@ class RecommendationsEngine:
         item_features = dataset.build_item_features(((x['id'],[x['name']]) for _, x in courses.iterrows()))
         (interactions, _) = dataset.build_interactions((
             (x['userId'], x['courseId']) for _, x in course_interactions.iterrows()))
-        
+        print('Dataset prepared!')
+
+        print('Training the model...') 
         model = LightFM(loss="warp", learning_rate=0.05)
         model.fit(interactions
           ,item_features=item_features
           ,epochs=30
+          ,verbose=True
           )
+        print('Model trained!') 
+        
         # Save the model
+        print("Saving the model...")
         with open(f'{models_directory}/recommendations-model.pickle', 'wb') as file_model:
             pickle.dump(model, file_model, protocol=pickle.HIGHEST_PROTOCOL)
+            print("Recommendations Model saved!")
         with open(f'{models_directory}/dataset.pickle', 'wb') as file_dataset:
             pickle.dump(dataset, file_dataset, protocol=pickle.HIGHEST_PROTOCOL)
+            print("Dataset saved!")
+
 # Deprecated
 # CourseModel
 # class CourseModel(tfrs.Model):
