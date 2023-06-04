@@ -30,7 +30,7 @@ def update_model():
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(update_model, "interval", minutes=10)
+scheduler.add_job(update_model, "interval", seconds=30)
 scheduler.start()
 
 app = Flask(__name__)
@@ -40,8 +40,19 @@ app = Flask(__name__)
 def get_recommended_course(user_id: int):
 
     courses = pd.read_sql("select * from Course", engine, columns=["id", "name"])
+    interactions = pd.read_sql(
+        "select * from CourseInteraction", engine, columns=["userId", "courseId"]
+    )
+    # Map the user ids to the index
+    user_ids = interactions['userId'].unique()
+    user_id_map = {id: i for i, id in enumerate(user_ids)}
+    user_index = user_id_map[user_id]
+    
+    print('User index: ', user_index)
+    
 
-    results = recommendations_engine.predict(user_id)
+    # Get the unique users
+    results = recommendations_engine.predict(user_index)
     if(results is None):
         data = pd.DataFrame(results)
         data = data.to_json(orient="records")
@@ -53,7 +64,7 @@ def get_recommended_course(user_id: int):
     top_items= pd.merge(top_items_id, top_items_name, left_index=True, right_index=True)
    
     # Convert to json
-    data = pd.DataFrame(top_items[:10])
+    data = pd.DataFrame(top_items[:20])
     data = data.to_json(orient="records")
 
     # Convert the ndarray to a list
