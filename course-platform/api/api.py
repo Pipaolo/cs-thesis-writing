@@ -43,8 +43,13 @@ def get_recommended_course(user_id: int):
     interactions = pd.read_sql(
         "select * from CourseInteraction", engine, columns=["userId", "courseId"]
     )
-    # Map the user ids to the index
+
+    '''
+    Map the received user id to the index of the user in the interactions dataframe
+    
+    '''
     user_ids = interactions['userId'].unique()
+    user_ids = user_ids[::-1]
     user_id_map = {id: i for i, id in enumerate(user_ids)}
     user_index = user_id_map[user_id]
     
