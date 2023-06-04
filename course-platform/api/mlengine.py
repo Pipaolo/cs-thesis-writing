@@ -37,10 +37,10 @@ class RecommendationsEngine:
         
     def train(self, courses: pd.DataFrame, course_interactions: pd.DataFrame):
         
-        dataset, _ = self._load()
         print("Start training process...")
         # Load the data
         print("Preparing dataset...")
+        dataset = Dataset()
         dataset.fit_partial(
             users=course_interactions['userId']
             ,items=courses['id']
