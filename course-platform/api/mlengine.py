@@ -23,7 +23,7 @@ class RecommendationsEngine:
 
         return (dataset, model)
 
-    def predict(self, userId: i
+    def predict(self, userId: int):
         try:
             # Load the model
             dataset, model = self._load()
