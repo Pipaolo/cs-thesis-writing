@@ -93,12 +93,12 @@ class RecommendationsEngine:
         print("Training the model...")
         model = LightFM(
             no_components=160,
-            learning_schedule="adadelta",
-            loss="warp",
-            learning_rate=0.1,
-            item_alpha=0.0001,
-            user_alpha=0.001,
-            max_sampled=35,
+            learning_schedule="adagrad",
+            loss="bpr",
+            learning_rate=0.01,
+            item_alpha=0.001,
+            user_alpha=0.0001,
+            max_sampled=25,
             random_state=42,
         )
 
