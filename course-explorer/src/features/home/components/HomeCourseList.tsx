@@ -60,12 +60,12 @@ const HomeCourseList = (props: Props) => {
     return data.map((course, i) => {
       return (
         <Tooltip
+          key={i}
           label={`Visit ${course.url}`}
           className=" max-w-xs truncate rounded-full bg-accent"
         >
           <div
             onClick={() => void onCoursePressed(i)}
-            key={i}
             className="flex cursor-pointer flex-col space-y-4 overflow-hidden rounded
           bg-secondary-button p-4 text-text transition duration-200 ease-in-out
           "

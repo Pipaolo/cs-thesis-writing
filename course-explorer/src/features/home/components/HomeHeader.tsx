@@ -34,7 +34,7 @@ const HomeHeader = (props: Props) => {
   return (
     <div className="flex w-full flex-col items-center justify-center space-y-4">
       <form
-        onSubmit={handleSubmit(onSubmit, console.error)}
+        onSubmit={void handleSubmit(onSubmit, console.error)}
         className="flex w-full space-x-4"
       >
         <InputGroup>

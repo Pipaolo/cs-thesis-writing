@@ -53,9 +53,12 @@ const HomeRecommendationList = () => {
     }
 
     return data.map((course, i) => (
-      <Tooltip label="Click to visit" className="rounded-full bg-accent">
+      <Tooltip
+        key={course.id}
+        label="Click to visit"
+        className="rounded-full bg-accent"
+      >
         <div
-          key={course.id}
           className="flex w-48 flex-shrink-0 cursor-pointer flex-col space-y-2 overflow-hidden rounded-xl  bg-secondary-button
         p-4 text-text shadow-md shadow-primary-button/50 outline-primary-button/20 transition duration-500 ease-in-out hover:outline 
         "
