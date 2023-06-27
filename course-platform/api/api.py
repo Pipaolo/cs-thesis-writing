@@ -12,18 +12,17 @@ recommendations_engine = RecommendationsEngine()
 
 # CRON Job
 def update_model():
-    """This updates the model every 24 hours"""
+    """This updates the model every 30 hours"""
     print("Updating the model...")
     # Load the data
-    print("Loading the data...")
-    courses = pd.read_sql("select * from Course", engine, columns=["id", "name"])
+    print("Fetching data from database...")
+    courses = pd.read_sql(
+        "select * from Course", engine, columns=["id", "name", "description"]
+    )
     interactions = pd.read_sql(
         "select * from CourseInteraction", engine, columns=["userId", "courseId"]
     )
-    print("Found Courses: ", len(courses))
-    print("Found Interactions: ", len(interactions))
-
-    print("Data loaded!")
+    print("Data fetched!")
 
     recommendations_engine.train(courses, interactions)
     print("Model updated!")

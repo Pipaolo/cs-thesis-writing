@@ -1,11 +1,11 @@
-from typing import Dict, Text, List,cast, Tuple
+from typing import Dict, Text, List, cast, Tuple
 from lightfm.data import Dataset
 from lightfm import LightFM
 import numpy as np
 import pandas as pd
 import pickle
 
-models_directory = 'trained_models'
+models_directory = "trained_models"
 
 
 class RecommendationsEngine:
@@ -13,12 +13,12 @@ class RecommendationsEngine:
         pass
 
     def _load(self) -> Tuple[Dataset, LightFM]:
-        file_model = open(f'{models_directory}/recommendations-model.pickle', 'rb')
-        file_dataset = open(f'{models_directory}/dataset.pickle', 'rb')
-        
+        file_model = open(f"{models_directory}/recommendations-model.pickle", "rb")
+        file_dataset = open(f"{models_directory}/dataset.pickle", "rb")
+
         dataset = cast(Dataset, pickle.load(file_dataset))
-        model = cast(LightFM, pickle.load(file_model)) 
-        
+        model = cast(LightFM, pickle.load(file_model))
+
         file_model.close()
         file_dataset.close()
 
@@ -35,44 +35,93 @@ class RecommendationsEngine:
             return scores
         except ValueError:
             return None
-        
+
+    def prepare_df(self, courses: pd.DataFrame, course_interactions: pd.DataFrame):
+        # Add a separate interaction count column to the interactions dataframe
+        interactions = course_interactions
+        interactions["interaction_count"] = interactions.groupby(
+            ["userId", "courseId"]
+        )["userId"].transform("count")
+
+        items = courses
+        items.rename(columns={"id": "courseId"}, inplace=True)
+
+        return interactions, items
+
     def train(self, courses: pd.DataFrame, course_interactions: pd.DataFrame):
-        
         print("Start training process...")
+        # Prepare the data
+        item_interactions, items = self.prepare_df(courses, course_interactions)
+
         # Load the data
         print("Preparing dataset...")
-        dataset = Dataset()
-        dataset.fit_partial(
-            users=course_interactions['userId']
-            ,items=courses['id']
-            ,item_features=courses['name']
+
+        ds = Dataset()
+        ds.fit(
+            users=item_interactions["userId"],
+            user_features=item_interactions["interaction_count"],
+            items=item_interactions["courseId"],
         )
 
-        item_features = dataset.build_item_features(((x['id'],[x['name']]) for _, x in courses.iterrows()))
-        (interactions, _) = dataset.build_interactions((
-            (x['userId'], x['courseId']) for _, x in course_interactions.iterrows()))
-            
-        print('Dataset prepared!')
+        ds.fit_partial(
+            items=items["courseId"],
+            item_features=items["name"],
+        )
+        ds.fit_partial(
+            items=items["courseId"],
+            item_features=items["description"],
+        )
 
-        print('Training the model...') 
-        model = LightFM(loss="bpr"
-                        ,learning_rate=0.01)
-        
-        model.fit(interactions
-          ,item_features=item_features
-          ,epochs=150
-          )
-          
-        print('Model trained!') 
-        
+        item_features = ds.build_item_features(
+            (
+                (x["courseId"], [x["name"], x["description"]])
+                for _, x in items.iterrows()
+            )
+        )
+        user_features = ds.build_user_features(
+            (
+                (x["userId"], [x["interaction_count"]])
+                for _, x in item_interactions.iterrows()
+            )
+        )
+        (interactions, weights) = ds.build_interactions(
+            ((x["userId"], x["courseId"]) for _, x in item_interactions.iterrows())
+        )
+
+        print("Dataset prepared!")
+
+        print("Training the model...")
+        model = LightFM(
+            no_components=160,
+            learning_schedule="adadelta",
+            loss="warp",
+            learning_rate=0.1,
+            item_alpha=0.0001,
+            user_alpha=0.001,
+            max_sampled=35,
+            random_state=42,
+        )
+
+        model.fit(
+            interactions,
+            user_features=user_features,
+            item_features=item_features,
+            epochs=20,
+            num_threads=4,
+        )
+        print("Model trained!")
+
         # Save the model
         print("Saving the model...")
-        with open(f'{models_directory}/recommendations-model.pickle', 'wb') as file_model:
+        with open(
+            f"{models_directory}/recommendations-model.pickle", "wb"
+        ) as file_model:
             pickle.dump(model, file_model, protocol=pickle.HIGHEST_PROTOCOL)
             print("Recommendations Model saved!")
-        with open(f'{models_directory}/dataset.pickle', 'wb') as file_dataset:
-            pickle.dump(dataset, file_dataset, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f"{models_directory}/dataset.pickle", "wb") as file_dataset:
+            pickle.dump(ds, file_dataset, protocol=pickle.HIGHEST_PROTOCOL)
             print("Dataset saved!")
+
 
 # Deprecated
 # CourseModel
@@ -81,7 +130,7 @@ class RecommendationsEngine:
 #                  user_model: tf.keras.Model,
 #                  course_model: tf.keras.Model,
 #                  task: tfrs.tasks.Retrieval):
-        
+
 #         super().__init__()
 
 #         self.user_model = user_model
@@ -103,7 +152,7 @@ class RecommendationsEngine:
 #         # Load the model
 #         model = tf.keras.models.load_model('recommendations-model')
 #         _, results = model(np.array([userId]))
-    
+
 #         return results.numpy().tolist()[0]
 
 
@@ -127,13 +176,13 @@ class RecommendationsEngine:
 #         interactions = tf.data.Dataset.from_tensor_slices(dict(interactions))
 #         courses = tf.data.Dataset.from_tensor_slices(courses)
 #         return courses, interactions
-        
+
 #     def train(self, courses: pd.DataFrame, interactions: pd.DataFrame):
 #         # Sanitize the data first
 #         courses_ds, interactions_ds = self.sanitize(courses, interactions)
 
 #         # Convert the user ids and course names into unique integer ids
-#         user_ids_vocab = tf.keras.layers.StringLookup(mask_token=None)  
+#         user_ids_vocab = tf.keras.layers.StringLookup(mask_token=None)
 #         user_ids_vocab.adapt(interactions_ds.map(lambda x: x["userId"]))
 
 #         course_names_vocab = tf.keras.layers.StringLookup(mask_token=None)
@@ -160,7 +209,7 @@ class RecommendationsEngine:
 
 #         bruteForce = tfrs.layers.factorized_top_k.BruteForce(model.user_model)
 #         bruteForce.index_from_dataset(courses_ds.batch(2).map(lambda name: (name, model.course_model(name))))
-        
+
 #         # We need to try to predict something to build the index
 #         bruteForce(np.array(["2"]))
 
@@ -173,6 +222,3 @@ class RecommendationsEngine:
 #             signatures=None,
 #             options=None
 #         )
-
-
-
