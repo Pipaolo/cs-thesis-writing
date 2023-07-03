@@ -1,14 +1,12 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
 import { courseSearchAtom } from "@/src/pages";
 import { UserButton } from "@clerk/nextjs";
 import { useAtom, useAtomValue } from "jotai";
-import { SearchIcon } from "lucide-react";
+import { Search, SearchIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HomeSearchFormSchema } from "../types";
 import { useRouter } from "next/router";
+import { Button, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
 
 interface Props {
   isLoading: boolean | undefined;
@@ -35,29 +33,23 @@ const HomeHeader = (props: Props) => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center space-y-4">
-      <UserButton
-        userProfileMode="navigation"
-        appearance={{
-          elements: {
-            avatarBox: "w-12 h-12",
-          },
-        }}
-      />
       <form
-        onSubmit={handleSubmit(onSubmit, console.error)}
+        onSubmit={void handleSubmit(onSubmit, console.error)}
         className="flex w-full space-x-4"
       >
-        <Input
-          {...register("query")}
-          placeholder="Search any course you like..."
-          type="text"
-        />
-        <Button type="submit" disabled={isLoading}>
-          <div className="flex space-x-2">
-            <span>Search</span>
-            <SearchIcon size={"1rem"} />
-          </div>
-        </Button>
+        <InputGroup>
+          <Input
+            {...register("query")}
+            className="peer bg-secondary-button placeholder:text-text focus:border-primary-button "
+            placeholder="Search any course you like..."
+            variant={"filled"}
+            rounded={"full"}
+            type="text"
+          />
+          <InputLeftElement className="transition duration-300 peer-focus:text-primary-button">
+            <SearchIcon size={"1.2rem"} />
+          </InputLeftElement>
+        </InputGroup>
       </form>
     </div>
   );

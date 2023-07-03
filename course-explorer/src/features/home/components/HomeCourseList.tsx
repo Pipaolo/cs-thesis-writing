@@ -1,5 +1,6 @@
 import { courseSearchAtom } from "@/src/pages";
 import { api, type RouterOutputs } from "@/src/utils/api";
+import { Button, Heading, Tooltip } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 
 type Courses = RouterOutputs["course"]["searchCourses"];
@@ -41,38 +42,41 @@ const HomeCourseList = (props: Props) => {
   };
 
   const renderItems = () => {
+    if (searchTerm === "") {
+      return <div></div>;
+    }
     if (isLoading) {
       return <HomeCourseListLoader />;
     }
 
-    if (searchTerm === "") {
-      return (
-        <div className="rounded-xl bg-gradient-to-br from-blue-300 to-blue-800  p-4 text-center font-bold  shadow-md">
-          <h4 className="text-lg text-white">Search for a course</h4>
-        </div>
-      );
-    }
-
     if (data.length === 0) {
       return (
-        <div className="rounded-xl bg-gradient-to-br from-blue-300 to-blue-800  p-4 text-center font-bold  shadow-md">
-          <h4 className="text-lg text-white">No Courses Found</h4>
+        <div className="rounded-xl bg-secondary-button p-4 text-center  font-bold shadow-md">
+          <h4 className="text-lg text-text">No Courses Found</h4>
         </div>
       );
     }
 
     return data.map((course, i) => {
       return (
-        <div
-          onClick={() => void onCoursePressed(i)}
+        <Tooltip
           key={i}
-          className="flex cursor-pointer flex-col space-y-2 overflow-hidden rounded-xl bg-white p-4
-          shadow-md transition duration-200 ease-in-out hover:shadow-lg
-          "
+          label={`Visit ${course.url}`}
+          className=" max-w-xs truncate rounded-full bg-accent"
         >
-          <span className="text-lg font-bold">{course.title}</span>
-          <span className="text-xs">{course.description}</span>
-        </div>
+          <div
+            onClick={() => void onCoursePressed(i)}
+            className="flex cursor-pointer flex-col space-y-4 overflow-hidden rounded
+          bg-secondary-button p-4 text-text transition duration-200 ease-in-out
+          "
+          >
+            <div className="flex flex-col">
+              <span className="text-lg font-bold">{course.title}</span>
+              <span className="text-xs italic text-accent">{course.url}</span>
+              <span className="mt-2 text-xs">{course.description}</span>
+            </div>
+          </div>
+        </Tooltip>
       );
     });
   };

@@ -1,16 +1,14 @@
-import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { useState } from "react";
 import Papa from "papaparse";
 import { type CourseCSV, type Course } from "@/src/features/course/types";
 import { api } from "@/src/utils";
 import { useRouter } from "next/router";
-import { useToast } from "@/src/components/ui/use-toast";
+import { Button, Input, useToast } from "@chakra-ui/react";
 const AdminHomePage = () => {
   const [file, setFile] = useState<File | null>(null);
   const addManyCourses = api.course.addMany.useMutation();
-  const { toast } = useToast();
+  const toast = useToast();
   const router = useRouter();
 
   const onUploadPressed = async () => {

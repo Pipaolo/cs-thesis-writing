@@ -1,32 +1,33 @@
 import { type AppType } from "next/app";
 import { Inter } from "next/font/google";
 import { api } from "~/utils/api";
-import { dark } from "@clerk/themes";
 
 import "~/styles/globals.css";
 
 import { ClerkProvider } from "@clerk/nextjs";
-import { ToastProvider } from "@/components/ui/toast";
+import { ChakraProvider } from "@chakra-ui/react";
+import { theme } from "../utils/theme";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
 });
+
 const MyApp: AppType = ({ Component, pageProps: { ...pageProps } }) => {
   return (
     <>
-      <ClerkProvider {...pageProps}>
-        <main className={`${inter.variable} font-inter`}>
-          <Component {...pageProps} />
-          <ToastProvider />
-        </main>
-      </ClerkProvider>
       <style jsx global>{`
-        html {
-          font-family: ${inter.style.fontFamily};
+        :root {
+          --font-inter: ${inter.style.fontFamily};
+          font-family: var(--font-inter);
         }
       `}</style>
+      <ClerkProvider {...pageProps}>
+        <ChakraProvider theme={theme}>
+          <Component {...pageProps} />
+        </ChakraProvider>
+      </ClerkProvider>
     </>
   );
 };
